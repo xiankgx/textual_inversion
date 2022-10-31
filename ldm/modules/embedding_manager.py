@@ -129,14 +129,20 @@ class EmbeddingManager(nn.Module):
         return embedded_text
 
     def save(self, ckpt_path):
-        torch.save({"string_to_token": self.string_to_token_dict,
-                    "string_to_param": self.string_to_param_dict}, ckpt_path)
+        torch.save({
+            "string_to_token": self.string_to_token_dict,
+            "string_to_param": self.string_to_param_dict,
+
+            "max_vectors_per_token": self.max_vectors_per_token
+        }, ckpt_path)
 
     def load(self, ckpt_path):
         ckpt = torch.load(ckpt_path, map_location='cpu')
 
         self.string_to_token_dict = ckpt["string_to_token"]
         self.string_to_param_dict = ckpt["string_to_param"]
+        if "max_vectors_per_token" in ckpt:
+            self.max_vectors_per_token = ckpt["max_vectors_per_token"]
 
     def get_embedding_norms_squared(self):
         all_params = torch.cat(list(self.string_to_param_dict.values()), axis=0) # num_placeholders x embedding_dim

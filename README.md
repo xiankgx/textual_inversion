@@ -1,5 +1,11 @@
 # An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion
 
+## Usage
+1. Create a container from a base Pytorch image. I used `pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel`.
+2. In the project root directory, run `pip install -r requirements.txt`.
+3. To train, see `train.sh` and modify accordingly. The parameters in the YAML config files we are interested in the `personalization_config` block are: `placeholder_strings`, `initializer_words`, and `num_vectors_per_token`. The placeholder strings are replaced underneath the hood with learned embeddings. The `num_vectors_per_token` specifies the number of tokens to represent one placeholder string. If `num_vectors_per_token > 1`, we can think of this as learning a sentence for a placeholder string. Since we are learning embeddings for placeholder string, the embeddings for `initializer_words` are used as initialization for the `plaeholder_strings` to ease optimization but should not matter even if it is set incorrectly. The `--init_word` parameter is used to override the `initializer_words` in the YAML config file. In the `data` block, use the target `ldm.data.personalized.PersonalizedBase` to train embeddings to represent an object, or the target `ldm.data.personalized_style.PersonalizedBase` to represent a style. On a RTX 3090, I was able to train with a batch size of 4 (maybe higher (6-8) is possible) for Latent Diffusion Model, and a max batch size of 2 for Stable Diffusion. 
+4. To generate, use `generate.sh` for Latent Diffusion Model, or `generate_stable.sh` for Stable Diffusion. If it complains of not being able to find `ldm` modules, either add the directory `ldm` to Python path, or install `ldm` from this repository by doing `pip install -e .` in the project root directory.
+
 [![arXiv](https://img.shields.io/badge/arXiv-2208.01618-b31b1b.svg)](https://arxiv.org/abs/2208.01618)
 
 [[Project Website](https://textual-inversion.github.io/)]
